@@ -217,6 +217,14 @@ void reverse(
     // temporary indices
     size_t j, ell;
 
+    // length of the text vector (used by CppAD assert macros)
+    const size_t num_text = play->num_text_rec();
+
+    // pointer to the beginning of the text vector
+    const char* text = CPPAD_NULL;
+    if( num_text > 0 )
+        text = play->GetTxt(0);
+
     // Initialize
 # if CPPAD_REVERSE_TRACE
     std::cout << std::endl;
@@ -566,7 +574,10 @@ void reverse(
             // --------------------------------------------------
 
             case PriOp:
-            // no result so nothing to do
+            reverse_pri_op(
+                d, i_var, size_t(arg[0]), J, Taylor, K, Partial,
+                std::cout, arg, num_text, text, parameter
+            );
             break;
             // --------------------------------------------------
 

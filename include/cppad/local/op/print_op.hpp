@@ -143,5 +143,54 @@ void forward_pri_0(
         s_out << before << var << after;
 }
 
+
+template <class Base>
+void reverse_pri_op(
+    // standard uniary op arguments
+    size_t      d            , // highest order Taylor coefficient
+    size_t      i_z          , // i_var
+    size_t      i_x          , // size_t(arg[0])
+    size_t      cap_order    , // J
+    const Base* taylor       , // Taylor
+    size_t      nc_partial   , // K
+    Base*       partial      , // Partial
+    // New arguments
+    std::ostream& s_out      ,
+    const addr_t* arg        ,
+    size_t        num_text   ,
+    const char*   text       ,
+    const Base*   parameter  )
+{
+    // check assumptions
+    CPPAD_ASSERT_UNKNOWN( d < cap_order );
+    CPPAD_ASSERT_UNKNOWN( d < nc_partial );
+
+    const char* before;
+    const char* after;
+    
+    // before
+    CPPAD_ASSERT_UNKNOWN( size_t(arg[2]) < num_text );
+    before = text + arg[2];
+    
+    CPPAD_ASSERT_UNKNOWN( size_t(arg[4]) < num_text );
+    after = text + arg[4];
+
+    s_out << before;
+    if( arg[0] & 2 )
+    {       
+        // Taylor coefficients and partials corresponding to argument
+        const Base* x  = taylor  +  size_t(arg[3]) * cap_order;
+        Base* px       = partial +  size_t(arg[3]) * nc_partial;
+
+        s_out << x[0] << after << ";";
+        s_out << " dloss/dx: " << px[0] << std::endl;
+    }
+    else
+    {   CPPAD_ASSERT_UNKNOWN( size_t(arg[3]) < num_par );
+        Base var = parameter[ arg[3] ];
+        s_out << var << after << "; dloss/dx: grad printing not implemented for params." << std::endl;
+    }
+}
+
 } } // END_CPPAD_LOCAL_NAMESPACE
 # endif
